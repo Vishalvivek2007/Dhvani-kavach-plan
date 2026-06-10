@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dhwani-Kavach — Build Plan</title>
+<style>
+  :root {
+    --bg: #0C0F1A; --bg2: #131829; --bg3: #1A2035;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #EFF0F4; --text2: #8E9AB8; --text3: #5A6580;
+    --mono: 'Courier New', monospace;
+    --green: #22C55E; --amber: #F59E0B; --red: #EF4444;
+    --teal: #14B8A6; --blue: #60A5FA; --purple: #A78BFA;
+    --pink: #F472B6; --orange: #FB923C; --dblue: #3B82F6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; padding: 24px; }
+  code { font-family: var(--mono); font-size: 11.5px; background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 3px; color: #94D8F7; }
+
+  h1 { font-size: 22px; font-weight: 600; color: var(--text); }
+  .subtitle { font-size: 13px; color: var(--text2); margin-top: 3px; }
+
+  .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .deadline { text-align: right; }
+  .deadline-val { font-size: 20px; font-weight: 600; color: var(--teal); font-family: var(--mono); }
+  .deadline-lbl { font-size: 11px; color: var(--text3); }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+  .stat { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .stat-val { font-size: 26px; font-weight: 600; color: var(--text); line-height: 1; margin-bottom: 4px; }
+  .stat-lbl { font-size: 11px; color: var(--text2); }
+  .stat-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  .tl { margin-bottom: 16px; }
+  .tl-bar { display: flex; height: 6px; border-radius: 3px; gap: 2px; overflow: hidden; }
+  .tl-seg { height: 6px; border-radius: 2px; }
+  .tl-labels { display: flex; gap: 2px; margin-top: 5px; }
+  .tl-label { font-size: 9.5px; font-family: var(--mono); white-space: nowrap; overflow: hidden; }
+
+  .controls { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 12px; }
+  .btn { background: var(--bg2); border: 0.5px solid var(--border2); color: var(--text2); border-radius: 6px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
+  .btn:hover { background: var(--bg3); color: var(--text); }
+
+  .phases { display: flex; flex-direction: column; gap: 6px; }
+  .phase-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .phase-header { display: flex; align-items: stretch; cursor: pointer; width: 100%; background: none; border: none; text-align: left; }
+  .phase-header:hover { background: rgba(255,255,255,0.02); }
+  .ph-accent { width: 3px; flex-shrink: 0; }
+  .ph-inner { flex: 1; padding: 11px 14px; display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .ph-id { font-size: 11px; font-weight: 600; font-family: var(--mono); min-width: 62px; flex-shrink: 0; }
+  .ph-title { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
+  .ph-meta { font-size: 11px; color: var(--text3); white-space: nowrap; }
+  .ph-chevron { font-size: 16px; color: var(--text3); flex-shrink: 0; transition: transform 0.2s; }
+  .ph-chevron.open { transform: rotate(180deg); }
+
+  .phase-body { padding: 4px 14px 14px 17px; }
+  .step { display: flex; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid var(--border); }
+  .step-num { min-width: 22px; height: 22px; background: var(--bg3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--text3); flex-shrink: 0; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-text { font-size: 13px; color: var(--text); line-height: 1.55; margin-bottom: 7px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag { font-size: 10.5px; font-family: var(--mono); padding: 2px 7px; border-radius: 3px; white-space: nowrap; font-weight: 500; }
+  .tag-ml  { background: rgba(245,158,11,0.15); color: #F59E0B; }
+  .tag-fe  { background: rgba(96,165,250,0.13); color: #60A5FA; }
+  .tag-infra { background: rgba(148,163,184,0.1); color: #94A3B8; border: 0.5px solid rgba(148,163,184,0.2); }
+  .tag-audio { background: rgba(20,184,166,0.12); color: #2DD4BF; }
+
+  .milestone { background: rgba(34,197,94,0.08); border: 0.5px solid rgba(34,197,94,0.25); border-radius: 8px; padding: 11px 14px; display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; }
+  .ms-flag { font-size: 18px; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+  .ms-label { font-size: 10px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .ms-text { font-size: 12.5px; color: #C4E8CF; line-height: 1.55; }
+
+  .footer { margin-top: 14px; background: var(--bg2); border: 0.5px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
+  .footer-text { font-size: 12.5px; color: var(--text2); flex: 1; line-height: 1.6; }
+  .footer strong { color: var(--teal); }
+  .cta-btn { background: var(--teal); color: #000; border: none; border-radius: 6px; padding: 8px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .cta-btn:hover { opacity: 0.88; }
+
+  .legend { display: flex; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text3); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="header-row">
+  <div>
+    <h1>🛡️ Dhwani-Kavach — Build Plan</h1>
+    <p class="subtitle">Audio forensics for banking security · Team Error 404 · VIT Vellore</p>
+  </div>
+  <div class="deadline">
+    <div class="deadline-val">Jul 2</div>
+    <div class="deadline-lbl">submission deadline</div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-val">23</div><div class="stat-lbl">Days total</div><div class="stat-sub">Jun 10 → Jul 2</div></div>
+  <div class="stat"><div class="stat-val">9</div><div class="stat-lbl">Build phases</div><div class="stat-sub">Phase 0 through Phase 4</div></div>
+  <div class="stat"><div class="stat-val">38</div><div class="stat-lbl">Numbered steps</div><div class="stat-sub">Fully sequential</div></div>
+  <div class="stat"><div class="stat-val">9</div><div class="stat-lbl">Milestones</div><div class="stat-sub">Each = a visible output</div></div>
+</div>
+
+<div class="tl" id="tl"></div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>ML / model</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#60A5FA"></div>Frontend / React</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#475569"></div>Infra / tooling</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2DD4BF"></div>Audio / data</div>
+</div>
+
+<div class="controls">
+  <button class="btn" id="btn-expand">Expand all</button>
+  <button class="btn" id="btn-collapse">Collapse all</button>
+</div>
+
+<div class="phases" id="phases-container"></div>
+
+<div class="footer">
+  <span style="font-size:22px">⚡</span>
+  <p class="footer-text">Every milestone produces a <strong>runnable, visible output</strong> — terminal tables, curl JSON responses, or a live browser UI. The product is fully demo-able from Phase 1C (Day 11) onward, not just at the finish line.</p>
+  <button class="cta-btn" onclick="alert('Use Claude to generate Phase 0 setup scripts!')">Start building →</button>
+</div>
+
+<script>
+const TAG_CLASS = {
+  "AASIST":"tag-ml","PyTorch":"tag-ml","HuggingFace":"tag-ml","scikit-learn":"tag-ml",
+  "React":"tag-fe","Vite":"tag-fe","Chart.js":"tag-fe","Tailwind":"tag-fe","Web Audio API":"tag-fe",
+  "Docker":"tag-infra","Redis":"tag-infra","nginx":"tag-infra","Git":"tag-infra","Bash":"tag-infra","pip":"tag-infra","npm":"tag-infra","Node":"tag-infra","asyncio":"tag-infra","FastAPI":"tag-infra",
+  "librosa":"tag-audio","numpy":"tag-audio","scipy":"tag-audio",
+  "Python":"tag-infra","WebSocket":"tag-infra",
+};
+function tc(t){ return TAG_CLASS[t]||"tag-infra"; }
+function pt(text){ return text.replace(/`([^`]+)`/g,'<code>$1</code>'); }
+
+const phases = [
+  { id:"p0", label:"Phase 0", title:"Foundation & setup", days:"Days 1–2", dates:"Jun 10–11", accent:"#14B8A6", flex:8.7,
+    steps:[
+      { n:1, t:"Create monorepo: `frontend/`, `backend/`, `ml/`, `docker/` — full project skeleton before any code is written", tags:["Git","Bash"] },
+      { n:2, t:"Python env: `pip install fastapi uvicorn torch torchaudio librosa soundfile redis scikit-learn websockets numpy scipy`", tags:["pip","Python"] },
+      { n:3, t:"Node env: `npm install react vite chart.js tailwindcss` — scaffold frontend project with Vite config", tags:["npm","Node"] },
+      { n:4, t:"Download AASIST pretrained weights from HuggingFace (`aai3o/aasist`) — verify file integrity, confirm `torch.load()` succeeds", tags:["HuggingFace","PyTorch"] },
+      { n:5, t:"Docker Compose skeleton: backend (uvicorn :8000), redis (:6379), frontend (nginx :3000) with named volumes and health checks", tags:["Docker"] },
+    ],
+    milestone:"🏁 <b>Env verified</b> — `docker compose up` starts all 3 services. All Python imports succeed. AASIST weights load without error."
+  },
+  { id:"p1a", label:"Phase 1A", title:"Spectrogram pipeline", days:"Days 3–5", dates:"Jun 12–14", accent:"#60A5FA", flex:13,
+    steps:[
+      { n:6, t:"`audio_utils.py`: `load_audio()`, `resample_to_16khz()`, `chunk_pcm_10s()` — handles .wav, .mp3, and raw PCM from WebSocket stream", tags:["librosa","Python"] },
+      { n:7, t:"`spectrogram.py`: `compute_mel_spectrogram()` — n_mels=128, hop_length=160, win_length=400, output tensor shape (1 × 128 × T)", tags:["librosa","numpy"] },
+      { n:8, t:"`handcrafted.py`: `extract_mfcc(n=20)`, `jitter()`, `shimmer()` — biological vocal micro-imperfections that AI models average out", tags:["librosa","scipy"] },
+      { n:9, t:"CLI comparison: `python test_features.py real.wav fake.wav` — prints side-by-side feature table with numeric values for both files", tags:["Python"] },
+    ],
+    milestone:"📊 <b>Features visible</b> — Terminal prints real vs fake feature table. Jitter, shimmer, and MFCC std-dev values are visibly different between samples."
+  },
+  { id:"p1b", label:"Phase 1B", title:"5 detection layers", days:"Days 6–9", dates:"Jun 15–18", accent:"#A78BFA", flex:17.4,
+    steps:[
+      { n:10, t:"`aasist_model.py`: `load_pretrained(path)`, `forward(mel_tensor)` → spoof probability 0–1; wraps the AASIST graph attention network inference", tags:["AASIST","PyTorch"] },
+      { n:11, t:"`handcrafted_detector.py`: `score_mfccs_jitter_shimmer()` — Z-score distance from real-voice statistical baseline → 0–100 risk contribution", tags:["numpy","scipy"] },
+      { n:12, t:"`breath_detector.py`: `detect_breath_gaps()` — RMS energy thresholding; flag if no pause >200ms in any 10s window (AI speech flows unnaturally smooth)", tags:["librosa","numpy"] },
+      { n:13, t:"`phase_coherence.py`: `compute_phase_discontinuity()` — STFT phase spectrum analysis; detects vocoder seam artifacts at synthesis chunk boundaries", tags:["numpy","scipy"] },
+      { n:14, t:"`liveness.py`: `generate_challenge()` → random phrase the caller must repeat; `verify_response(audio)` → TTS-detection via pitch + duration matching", tags:["Python"] },
+    ],
+    milestone:"🔍 <b>All 5 layers active</b> — `python test_layers.py` prints a 5×5 table: 5 audio samples × 5 detectors. Each layer returns an independent 0–100 score."
+  },
+  { id:"p1c", label:"Phase 1C", title:"Ensemble voting + Redis", days:"Days 10–11", dates:"Jun 19–20", accent:"#F472B6", flex:8.7,
+    steps:[
+      { n:15, t:"`ensemble.py`: `weighted_vote()` — AASIST 40%, handcrafted 20%, breathing 15%, phase coherence 15%, liveness 10%; configurable weights via config file", tags:["scikit-learn","Python"] },
+      { n:16, t:"Risk banding: 0–30 → GREEN, 31–60 → AMBER, 61–100 → RED; output `{risk_score, alert_level, layer_breakdown}` typed dict", tags:["Python"] },
+      { n:17, t:"Redis pub/sub: `PUBLISH fraud-alerts <json_payload>` — async channel for broadcasting risk scores to all connected WebSocket consumers", tags:["Redis"] },
+      { n:18, t:"`detect_audio(path)` full pipeline: load → mel spectrogram → 5 parallel detectors → ensemble vote → Redis publish — target: <3s on CPU", tags:["Python","Redis"] },
+    ],
+    milestone:"✅ <b>Pipeline complete</b> — `python detect.py tests/` prints accuracy table over 10+ audio files. Target 90%+ correct labels. Full detection under 3s."
+  },
+  { id:"p2a", label:"Phase 2A", title:"FastAPI backend", days:"Days 12–13", dates:"Jun 21–22", accent:"#FB923C", flex:8.7,
+    steps:[
+      { n:19, t:"FastAPI app scaffold: CORS middleware, `GET /health`, structured JSON logging, Pydantic request/response models", tags:["FastAPI","Python"] },
+      { n:20, t:"`POST /analyze`: multipart audio file upload → ML detection pipeline → returns `{risk_score, alert_level, layer_breakdown}` JSON response", tags:["FastAPI","Python"] },
+      { n:21, t:"Async background task queue: inference worker runs non-blocking, HTTP requests return 202 immediately, result delivered via Redis/WS", tags:["FastAPI","asyncio"] },
+      { n:22, t:"`ws://host/ws/stream`: WebSocket endpoint accepting binary audio frames, emitting JSON risk-score messages after each 10s chunk is processed", tags:["FastAPI","WebSocket"] },
+    ],
+    milestone:"🌐 <b>API live</b> — `curl -F audio=@fake.wav localhost:8000/analyze` returns `{risk_score:94, alert_level:RED,...}` in <3 seconds. WebSocket handshake succeeds."
+  },
+  { id:"p2b", label:"Phase 2B", title:"Streaming pipeline", days:"Days 14–15", dates:"Jun 23–24", accent:"#F87171", flex:8.7,
+    steps:[
+      { n:23, t:"Chunk accumulator: buffer incoming binary WS frames → 10s PCM window → trigger detection → slide forward 5s (50% overlap for detection continuity)", tags:["Python","asyncio"] },
+      { n:24, t:"Redis subscriber → WS fan-out: subscriber loop pushes updated `{risk_score, layer_breakdown}` to all connected agent dashboard clients simultaneously", tags:["Redis","WebSocket"] },
+      { n:25, t:"Liveness challenge WS flow: server sends text phrase over WS → client streams 3s response audio chunks → server scores → returns pass/fail JSON", tags:["WebSocket","Python"] },
+    ],
+    milestone:"📡 <b>Streaming working</b> — Python WS test script connects, streams 10s pre-recorded audio, and receives sequential GREEN/AMBER/RED updates printed live in terminal."
+  },
+  { id:"p3a", label:"Phase 3A", title:"React dashboard core", days:"Days 16–18", dates:"Jun 25–27", accent:"#4ADE80", flex:13,
+    steps:[
+      { n:26, t:"Vite + React + Tailwind scaffold: component folder structure, React Router routes, WS base URL via `.env` variable, dark theme CSS tokens", tags:["Vite","React","Tailwind"] },
+      { n:27, t:"`useWebSocket` hook: auto-connect on mount, auto-reconnect on drop, binary message queue, connection status indicator dot in header", tags:["React","WebSocket"] },
+      { n:28, t:"Spectrogram canvas component: rolling 128-band mel display via `requestAnimationFrame` — 2s visible window, new frequency columns scroll left in real time", tags:["React","Chart.js"] },
+      { n:29, t:"Risk badge component: animated CSS color transition GREEN→AMBER→RED, large 0–100 numeric score display, pulse ring animation on each alert level change", tags:["React","Tailwind"] },
+    ],
+    milestone:"🖥️ <b>Dashboard visible</b> — Browser shows live scrolling spectrogram + animated risk badge. Load a pre-recorded fake.wav via backend and watch the score hit RED live."
+  },
+  { id:"p3b", label:"Phase 3B", title:"Dashboard polish", days:"Days 19–21", dates:"Jun 28–30", accent:"#38BDF8", flex:13,
+    steps:[
+      { n:30, t:"Layer breakdown panel: 5 labeled horizontal progress bars — AASIST, MFCC, Breathing, Phase Coherence, Liveness — showing per-layer 0–100 contributions", tags:["React","Chart.js"] },
+      { n:31, t:"Liveness challenge UI: display server-sent phrase to caller, capture browser mic via Web Audio API, stream audio chunks, show pass/fail result", tags:["React","Web Audio API"] },
+      { n:32, t:"Alert history sidebar: timestamped call log with mock caller ID, risk level badge, which layer fired — scrollable list, newest on top", tags:["React","Tailwind"] },
+      { n:33, t:"Demo scenario switcher: 3 buttons from the PPT — Scenario A (score 8, safe), Scenario B (score 94, ElevenLabs clone), Scenario C (score 78, custom model)", tags:["React"] },
+    ],
+    milestone:"🎨 <b>UI complete</b> — All 3 PPT demo scenarios produce the correct risk scores (8 / 94 / 78) with correct layer breakdowns and explainability panel showing which detector fired."
+  },
+  { id:"p4", label:"Phase 4", title:"Docker + demo ready", days:"Days 22–23", dates:"Jul 1–2", accent:"#14B8A6", flex:8.7,
+    steps:[
+      { n:34, t:"Docker Compose final: nginx (React production build, :3000), uvicorn (FastAPI, :8000), redis — `docker compose up -d` boots the full product one command", tags:["Docker","nginx"] },
+      { n:35, t:"Demo audio pack: record real customer voice, generate ElevenLabs TTS clone of the same voice, generate a custom fine-tuned TTS voice", tags:["Python"] },
+      { n:36, t:"Smoke test all 3 scenarios on Docker: correct risk scores, correct layer triggers, verify no regressions introduced by containerization", tags:["Docker","Python"] },
+      { n:37, t:"Performance validation: end-to-end <10s from call start to alert display, <3s alert delivery, 5 concurrent simulated calls with no queue backup", tags:["Python","asyncio"] },
+      { n:38, t:"README.md with setup guide, demo walkthrough script (step-by-step for judges), architecture diagram SVG, one-command Docker setup", tags:["Git"] },
+    ],
+    milestone:"🚀 <b>Ship it</b> — `docker compose up` → Dhwani-Kavach fully live on localhost. All 3 demo scenarios work. <10s detection confirmed. Product is submission-ready."
+  },
+];
+
+const openSet = new Set(["p0"]);
+
+function renderTl() {
+  const barHTML = phases.map(p=>`<div class="tl-seg" style="background:${p.accent};flex:${p.flex}" title="${p.label}: ${p.dates}"></div>`).join('');
+  const lblHTML = phases.map(p=>`<div class="tl-label" style="flex:${p.flex};color:${p.accent}">${p.label.replace('Phase ','')}</div>`).join('');
+  document.getElementById('tl').innerHTML=`<div class="tl-bar">${barHTML}</div><div class="tl-labels" style="display:flex;gap:2px;margin-top:5px">${lblHTML}</div>`;
+}
+
+function renderStep(s) {
+  const tags = s.tags.map(t=>`<span class="tag ${tc(t)}">${t}</span>`).join('');
+  return `<div class="step"><div class="step-num">${s.n}</div><div class="step-content"><div class="step-text">${pt(s.t)}</div><div class="tags">${tags}</div></div></div>`;
+}
+
+function renderCard(p) {
+  const isOpen = openSet.has(p.id);
+  const bodyHTML = isOpen ? `<div class="phase-body">${p.steps.map(renderStep).join('')}<div class="milestone"><span class="ms-flag">🚩</span><div><div class="ms-label">Milestone</div><div class="ms-text">${pt(p.milestone)}</div></div></div></div>` : '';
+  return `<div class="phase-card" id="card-${p.id}">
+    <button class="phase-header" onclick="toggle('${p.id}')">
+      <div class="ph-accent" style="background:${p.accent}"></div>
+      <div class="ph-inner">
+        <span class="ph-id" style="color:${p.accent}">${p.label}</span>
+        <span class="ph-title">${p.title}</span>
+        <span class="ph-meta">${p.days} · ${p.dates}</span>
+        <span class="ph-chevron${isOpen?' open':''}">▾</span>
+      </div>
+    </button>${bodyHTML}</div>`;
+}
+
+function render() {
+  document.getElementById('phases-container').innerHTML = phases.map(renderCard).join('');
+}
+
+window.toggle = function(id){ if(openSet.has(id)) openSet.delete(id); else openSet.add(id); render(); };
+document.getElementById('btn-expand').onclick = ()=>{ phases.forEach(p=>openSet.add(p.id)); render(); };
+document.getElementById('btn-collapse').onclick = ()=>{ openSet.clear(); render(); };
+
+renderTl();
+render();
+</script>
+</body>
+</html>
